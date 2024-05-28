@@ -21,7 +21,7 @@ clases = np.array([1, -1, -1, -1])
 
 """FUNCION DE ACTIVACIÓN"""
 
-def activacion(pesos,x,b):
+def activacion(pesos, x, b):
     z = pesos * x
     print("y: ", z.sum()+b)
     if z.sum() + b > 0:
@@ -30,15 +30,12 @@ def activacion(pesos,x,b):
         return -1
 
 
-"""INICIALIZACIÓN ALEATORIA"""
+"""INICIALIZACIÓN"""
 
 pesos = np.array([0.6473185, 0.37817776, 0.33160055])
-b = 0.576251061434036 
-print(pesos)
-print(b)
-
+b = 0.576251061434036
 tasa_de_aprendizaje = 0.4
-epocas = 1
+epocas = 4
 
 for epoca in range(epocas):
     error_total = 0
@@ -50,8 +47,5 @@ for epoca in range(epocas):
        pesos[1]+= tasa_de_aprendizaje * error * entradas[i][1]
        pesos[2]+= tasa_de_aprendizaje * error * entradas[i][2]
        b = b + tasa_de_aprendizaje * error
-       print("iteracion: ",i, "   error iteracion: ", error, "    pesos: ", pesos, "  b: ", b )
-    print("Final de la epoca: ", epoca, "  error_total: ", error_total)
-
-print(pesos)
-print(b)
+       print("iteracion: ", i, "   error iteracion: ", error, "    pesos: ", pesos, "  b: ", b)
+    print("Final de la epoca: ", epoca, "  error_total: ", error_total, "\n")
