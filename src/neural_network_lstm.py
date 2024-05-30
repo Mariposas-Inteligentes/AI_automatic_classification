@@ -15,23 +15,24 @@ from prompt_toolkit import print_formatted_text, HTML
 
 
 EMBEDDING_DIM = 300
-DATASET_DEFAULT_LOCATION = "../dataset/songsTaylorSwiftAndRihanna.xlsx"
+EMBEDDINGS_DEFAULT_LOCATION = "../embeddings/sbw_vectors.bin"
+DATASET_DEFAULT_LOCATION = "../dataset/dataset.xlsx"
 SUPPORT_PATH = "./support/"
 
 
 def word_to_id_map_get(vocab):
     word_to_id = {}
     word_to_id_file = Path(SUPPORT_PATH + "word_to_id.json")
-    if word_to_id_file.is_file():
-        print("Using an already existing word to id index file")
-        word_to_id = json.load(open(word_to_id_file, "r"))
-    else:
-        print("Creating word to id index...", end="", flush=True)
-        word_to_id = {word: i for i, word in enumerate(vocab, 1)}
+    # if word_to_id_file.is_file():
+    #     print("Using an already existing word to id index file")
+    #     word_to_id = json.load(open(word_to_id_file, "r"))
+    # else:
+    print("Creating word to id index...", end="", flush=True)
+    word_to_id = {word: i for i, word in enumerate(vocab, 1)}
 
-        Path(SUPPORT_PATH).mkdir(parents=True, exist_ok=True)
-        json.dump(word_to_id, open(word_to_id_file, "w"), indent=4)
-        print("[DONE]")
+    Path(SUPPORT_PATH).mkdir(parents=True, exist_ok=True)
+    json.dump(word_to_id, open(word_to_id_file, "w"), indent=4)
+    print("[DONE]")
 
     return word_to_id
 
@@ -44,24 +45,27 @@ def embedding_matrix_get(word_to_id, word_to_embedding):
     embedding_matrix = np.zeros((vocab_size, EMBEDDING_DIM))
 
     for word, i in word_to_id.items():
-        if word in word_to_embedding.wv:
-            embedding_matrix[i] = word_to_embedding.wv[word]
+        if word in word_to_embedding.vocab:
+            embedding_matrix[i] = word_to_embedding[word]
 
     print("[DONE]")
 
     return embedding_matrix
 
 
-def get_data_from_df(df, remove_stopwords, seq_len):
+def get_data_from_df(df, remove_stopwords, embeddings_file, seq_len):
     preprocess_df(df, remove_stopwords)
-    
-    print("Training word embeddings...", end="", flush=True)
-    sentences = [title.split() for title in df["title"]]
-    word_to_embedding = gensim.models.Word2Vec(sentences, size=EMBEDDING_DIM, window=5, min_count=1, workers=4)
+
+    # Load word embeddings
+    print("Loading word embeddings...", end="", flush=True)
+    word_to_embedding = gensim.models.KeyedVectors.load_word2vec_format(
+        embeddings_file, binary=True
+    )
     print("[DONE]")
 
     # Build word to id mapping
     vocab = set(" ".join([i for i in df["title"]]).split())
+    vocab = vocab.union(word_to_embedding.vocab)
     word_to_id = word_to_id_map_get(vocab)
 
     # Build embedding matrix
@@ -150,13 +154,19 @@ def main():
         "--test", action="store_true", help="Use test set to get performance metrics"
     )
     parser.add_argument("--save-model", type=str, help="Save model to specified path")
+    parser.add_argument(
+        "--embeddings-file",
+        type=str,
+        default=EMBEDDINGS_DEFAULT_LOCATION,
+        help="Path to the file with word to embedding mapping",
+    )
 
     args = parser.parse_args()
 
     # Read data
-    df = pd.read_excel(DATASET_DEFAULT_LOCATION)
+    df = pd.read_excel(DATASET_DEFAULT_LOCATION, sheet_name="Final")
     data, embedding_matrix = get_data_from_df(
-        df, args.remove_stopwords, args.sequence_len
+        df, args.remove_stopwords, args.embeddings_file, args.sequence_len,
     )
     labels = get_labels_from_df(df)
 

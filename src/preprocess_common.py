@@ -2,15 +2,19 @@ import pandas as pd
 import numpy as np
 import nltk
 
-def preprocess_df(df, remove_stopwords):
-    df['title'] = df['title'].astype(str)
-    df['title'].fillna('', inplace=True)
 
+def preprocess_df(df, remove_stopwords):
+    df["title"] = df["title"].str.replace("\d+", "DIGITO")
+    df["title"] = df["title"].str.replace("[^ \nA-Za-z0-9À-ÖØ-öø-ÿ]+", "")
     if remove_stopwords:
-        from nltk.corpus import stopwords
-        stop = set(stopwords.words('english'))
-        df['title'] = df['title'].apply(lambda x: ' '.join([word for word in str(x).split() if word.lower() not in stop]))
-    return df
+        nltk.download("stopwords")
+        spanish_stopwords = set(nltk.corpus.stopwords.words("spanish"))
+
+        df["title"] = df["title"].apply(
+            lambda x: " ".join(
+                [word for word in x.split() if word.lower() not in spanish_stopwords]
+            )
+        )
 
 
 def pad_data(data, seq_length):
