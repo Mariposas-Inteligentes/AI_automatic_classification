@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import GaussianNB
 
 
-DATASET_DEFAULT_LOCATION = "../dataset/dataset.xlsx"
+DATASET_DEFAULT_LOCATION = "../dataset/songsTaylorSwiftAndRihanna.xlsx"
 
 
 def main():
@@ -17,12 +17,13 @@ def main():
     parser.add_argument(
         "--remove-stopwords", action="store_true", help="Remove stopwords from dataset"
     )
-
     args = parser.parse_args()
 
     # Read data
-    df = pd.read_excel(DATASET_DEFAULT_LOCATION, sheet_name="Final")
+    df = pd.read_excel(DATASET_DEFAULT_LOCATION)
     df = df.sample(frac=1).reset_index(drop=True)
+
+    # Preprocess data
     preprocess_df(df, args.remove_stopwords)
     features = df.title.to_list()
     labels = df.label.to_list()
