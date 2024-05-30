@@ -16,7 +16,7 @@ from prompt_toolkit import print_formatted_text, HTML
 
 EMBEDDING_DIM = 300
 EMBEDDINGS_DEFAULT_LOCATION = "../embeddings/sbw_vectors.bin"
-DATASET_DEFAULT_LOCATION = "../dataset/dataset.xlsx"
+DATASET_DEFAULT_LOCATION = "../dataset/canciones.xlsx"
 SUPPORT_PATH = "./support/"
 
 
@@ -164,7 +164,7 @@ def main():
     args = parser.parse_args()
 
     # Read data
-    df = pd.read_excel(DATASET_DEFAULT_LOCATION, sheet_name="Final")
+    df = pd.read_excel(DATASET_DEFAULT_LOCATION, sheet_name="Sheet1")
     data, embedding_matrix = get_data_from_df(
         df, args.remove_stopwords, args.embeddings_file, args.sequence_len,
     )

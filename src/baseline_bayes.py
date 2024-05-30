@@ -9,7 +9,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import GaussianNB
 
 
-DATASET_DEFAULT_LOCATION = "../dataset/songsTaylorSwiftAndRihanna.xlsx"
+DATASET_DEFAULT_LOCATION = "../dataset/canciones.xlsx"
 
 
 def main():
