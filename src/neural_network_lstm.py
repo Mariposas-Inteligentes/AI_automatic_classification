@@ -23,12 +23,12 @@ SUPPORT_PATH = "./support/"
 def word_to_id_map_get(vocab):
     word_to_id = {}
     word_to_id_file = Path(SUPPORT_PATH + "word_to_id.json")
-    # if word_to_id_file.is_file():
-    #     print("Using an already existing word to id index file")
-    #     word_to_id = json.load(open(word_to_id_file, "r"))
-    # else:
-    print("Creating word to id index...", end="", flush=True)
-    word_to_id = {word: i for i, word in enumerate(vocab, 1)}
+    if word_to_id_file.is_file():
+        print("Using an already existing word to id index file")
+        word_to_id = json.load(open(word_to_id_file, "r"))
+    else:
+        print("Creating word to id index...", end="", flush=True)
+        word_to_id = {word: i for i, word in enumerate(vocab, 1)}
 
     Path(SUPPORT_PATH).mkdir(parents=True, exist_ok=True)
     json.dump(word_to_id, open(word_to_id_file, "w"), indent=4)
